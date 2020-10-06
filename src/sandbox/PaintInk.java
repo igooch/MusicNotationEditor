@@ -12,7 +12,6 @@ import music.UC;
 public class PaintInk extends Window {
 
   public static Ink.List inkList = new List();
-  static { inkList.add(new Ink()); }
 
   public PaintInk() {
     super("PaintInk", UC.WINDOW_WIDTH, UC.WINDOW_HEIGHT);

@@ -6,18 +6,44 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
-public class Ink extends G.PL implements I.Show{
+public class Ink implements I.Show {
+
   public static Buffer BUFFER = new Buffer(); // Singleton design pattern
+  public static final int K = UC.NORM_SAMPLE_SIZE;
+  public static G.VS TEMP = new G.VS(100, 100, 100, 100);
+
+  public Norm norm;
+  public G.VS vs;
 
   public Ink() {
-    super(BUFFER.n);
-    for (int i = 0; i < BUFFER.n; i++) { points[i].set(BUFFER.points[i]); }
+    norm = new Norm();
+    vs = BUFFER.bbox.getNewVS();
   }
 
   @Override
   public void show(Graphics g) {
     g.setColor(UC.INK_COLOR);
-    draw(g);
+    norm.drawAt(g, vs);
+  }
+
+  //----------------------------------Norm------------------------------------//
+  public static class Norm extends G.PL {
+    public static final int K = UC.NORM_SAMPLE_SIZE, MAX = UC.NORM_COORD_MAX;
+    public static final G.VS normBox = new G.VS(0, 0, MAX, MAX);
+
+    public Norm() {
+      super(K);
+      for (int i = 0; i < K; i++) { points[i].set(BUFFER.points[i*(BUFFER.n - 1) / (K -1)]); }
+      G.V.T.set(BUFFER.bbox, normBox);
+      this.transform();
+    }
+
+    public void drawAt(Graphics g, G.VS vs) {
+      G.V.T.set(normBox, vs);
+      for (int i = 1; i < K; i++) {
+        g.drawLine(points[i - 1].tx(), points[i - 1].ty(), points[i].tx(), points[i].ty());
+      }
+    }
   }
 
   //----------------------------------List------------------------------------//
