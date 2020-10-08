@@ -1,12 +1,13 @@
-package music;
+package reaction;
 
 import graphicsLib.G;
-import graphicsLib.G.BBox;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
+import music.I.Area;
+import music.I.Show;
+import music.UC;
 
-public class Ink implements I.Show {
+public class Ink implements Show {
 
   public static Buffer BUFFER = new Buffer(); // Singleton design pattern
   public static final int K = UC.NORM_SAMPLE_SIZE;
@@ -44,10 +45,26 @@ public class Ink implements I.Show {
         g.drawLine(points[i - 1].tx(), points[i - 1].ty(), points[i].tx(), points[i].ty());
       }
     }
+
+    public int dist(Norm norm) {
+      int result = 0;
+      for (int i = 0; i < K; i++) {
+        int dx = points[i].x - norm.points[i].x;
+        int dy = points[i].y - norm.points[i].y;
+        result += dx*dx + dy*dy;
+      }
+      return result;
+    }
+
+    public void blend(Norm norm, int nBlend) {
+      for (int i = 0; i < K; i++) {
+        points[i].blend(norm.points[i], nBlend);
+      }
+    }
   }
 
   //----------------------------------List------------------------------------//
-  public static class List extends ArrayList<Ink> implements I.Show {
+  public static class List extends ArrayList<Ink> implements Show {
 
     @Override
     public void show(Graphics g) { for (Ink ink: this) { ink.show(g); } }
@@ -55,7 +72,7 @@ public class Ink implements I.Show {
   }
 
   //---------------------------------Buffer-------------------------------------//
-  public static class Buffer extends G.PL implements I.Show, I.Area {
+  public static class Buffer extends G.PL implements Show, Area {
 
     public int n; // Number of points in the buffer
     public G.BBox bbox = new G.BBox();
